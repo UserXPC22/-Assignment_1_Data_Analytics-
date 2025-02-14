@@ -6,7 +6,7 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.preprocessing import StandardScaler
 
 np.random.seed(42)
-n_patients = 200
+n_patients = 300
 
 
 data = pd.DataFrame({
@@ -55,15 +55,14 @@ print("Matched Pairs:")
 print(matched_pairs.head())
 
 
-mean_pain = data.groupby('Treated')['Pain'].mean().reset_index()
+# Calculate the average pain score for treated and untreated patients
+average_pain = data.groupby('Treated')['Pain'].mean().reset_index()
 
+# Map the treated column to more descriptive labels
+average_pain['Treated'] = average_pain['Treated'].map({0: 'Untreated', 1: 'Treated'})
 
-wide_mean_pain = mean_pain.pivot(columns='Treated', values='Pain').reset_index(drop=True)
-
-
-fig = px.bar(wide_mean_pain, title="Average Pain Score in Treated vs Untreated Patients",
-             labels={0: "Untreated", 1: "Treated"},
-             barmode='group')
-
+# Create a bar graph
+fig = px.bar(average_pain, x='Treated', y='Pain', color='Treated', 
+             title='Average Pain Score in Treated vs Untreated Patients',
+             labels={'Pain': 'Average Pain Score', 'Treated': 'Patient Group'})
 fig.show()
-
